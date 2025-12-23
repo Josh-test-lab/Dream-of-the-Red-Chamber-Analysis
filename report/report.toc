@@ -8,17 +8,17 @@
 \contentsline {section}{第三章~~研究方法}{7}{section*.9}%
 \contentsline {subsection}{3.1 使用套件}{7}{section*.10}%
 \contentsline {subsection}{3.2 文字探勘}{8}{section*.11}%
-\contentsline {subsection}{3.3 資料視覺化}{10}{section*.14}%
-\contentsline {section}{第四章~~研究探討與分析}{11}{section*.16}%
-\contentsline {subsection}{4.1 數據清理}{11}{section*.17}%
-\contentsline {subsection}{4.2 文字雲}{13}{section*.21}%
-\contentsline {subsection}{4.3 網路圖}{14}{section*.23}%
-\contentsline {subsection}{4.4 MDS}{17}{section*.27}%
-\contentsline {subsection}{4.5 Jaccard}{18}{section*.29}%
-\contentsline {subsection}{4.6 PCA}{19}{section*.32}%
-\contentsline {subsection}{4.7 t-SNE}{19}{section*.34}%
-\contentsline {section}{第五章~~結論及建議}{21}{section*.36}%
-\contentsline {section}{參考文獻}{22}{section*.37}%
-\contentsline {section}{附錄}{24}{section*.39}%
-\contentsline {subsection}{R 語言程式碼}{24}{section*.40}%
-\contentsline {subsection}{資料檔案}{25}{section*.41}%
+\contentsline {subsection}{3.3 資料視覺化}{12}{section*.14}%
+\contentsline {section}{第四章~~研究探討與分析}{13}{section*.16}%
+\contentsline {subsection}{4.1 數據清理}{13}{section*.17}%
+\contentsline {subsection}{4.2 文字雲}{15}{section*.21}%
+\contentsline {subsection}{4.3 網路圖}{16}{section*.23}%
+\contentsline {subsection}{4.4 MDS}{19}{section*.27}%
+\contentsline {subsection}{4.5 Jaccard}{20}{section*.29}%
+\contentsline {subsection}{4.6 PCA}{21}{section*.32}%
+\contentsline {subsection}{4.7 t-SNE}{21}{section*.34}%
+\contentsline {section}{第五章~~結論及建議}{23}{section*.36}%
+\contentsline {section}{參考文獻}{24}{section*.37}%
+\contentsline {section}{附錄}{26}{section*.39}%
+\contentsline {subsection}{R 語言程式碼}{26}{section*.40}%
+\contentsline {subsection}{資料檔案}{48}{section*.41}%
