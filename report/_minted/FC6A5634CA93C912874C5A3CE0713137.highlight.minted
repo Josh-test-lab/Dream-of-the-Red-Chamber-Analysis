@@ -1,0 +1,9 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 定義回數 120回}
+\PYG{n}{num.hei}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{120}
+
+\PYG{c+c1}{\PYGZsh{} 統計出現次數函數}
+\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 宣告有name的存在}
+\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{stat\PYGZus{}name}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name}\PYG{p}{)}
+\PYG{n}{name\PYGZus{}all}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 將所有名字存入name\PYGZus{}all方便以後分析}
+\end{MintedVerbatim}

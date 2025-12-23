@@ -1,0 +1,21 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 統計出現幾次特定文字函數}
+\PYG{n}{stat\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name}\PYG{p}{)\PYGZob{}}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} name\PYGZus{}matrix \PYGZlt{}\PYGZhy{} 欲統計的字詞, num.hei \PYGZlt{}\PYGZhy{} 總回數, name \PYGZlt{}\PYGZhy{} 儲存的矩陣}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 名稱的替代(方便處理)}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}matrix\PYGZus{}change}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}person\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{),}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZti{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sep}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}matrix\PYGZus{}change2}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}person\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{sep}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 創建矩陣存放各章節人物出現次數}
+\PYG{+w}{  }\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nrow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{dimnames}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)))}
+
+\PYG{+w}{  }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{chapter}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{temp\PYGZus{}store\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{name\PYGZus{}matrix\PYGZus{}change}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{chapter}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{fixed}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 替換人物名稱並存入temp\PYGZus{}store\PYGZus{}name}
+\PYG{+w}{      }\PYG{n}{temp\PYGZus{}store\PYGZus{}name1}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{strsplit}\PYG{p}{(}\PYG{n}{temp\PYGZus{}store\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZti{}\PYGZdq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 切割字串並以\PYGZdq{}\PYGZti{}\PYGZdq{}分割}
+\PYG{+w}{      }\PYG{n}{name}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{grep}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix\PYGZus{}change2}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{temp\PYGZus{}store\PYGZus{}name1}\PYG{p}{[[}\PYG{l+m}{1}\PYG{p}{]]))}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 計算字串被切割幾次並儲存到name}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k+kr}{return}\PYG{p}{(}\PYG{n}{name}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

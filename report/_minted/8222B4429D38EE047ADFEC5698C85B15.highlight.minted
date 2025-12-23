@@ -1,0 +1,16 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 自定義檔名函數}
+\PYG{n}{file\PYGZus{}name\PYGZus{}function}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m}{10}\PYG{p}{)}
+\PYG{+w}{    }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}紅樓夢\PYGZus{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{else}\PYG{+w}{ }\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m}{100}\PYG{p}{)}
+\PYG{+w}{    }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}紅樓夢\PYGZus{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{else}
+\PYG{+w}{    }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}紅樓夢\PYGZus{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{return}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+\PYG{c+c1}{\PYGZsh{} 字數統計函數}
+\PYG{n}{stat\PYGZus{}words}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n+nf}{returnValue}\PYG{p}{(}\PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{nchar}\PYG{p}{(}\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}[，。！？：「」；《》『』——　 【、】1234567890]\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}[\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}]\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZhy{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}“\PYGZbs{}\PYGZbs{}”\PYGZbs{}\PYGZbs{}〝\PYGZbs{}\PYGZbs{}〞\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{file\PYGZus{}name}\PYG{p}{))))))))}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

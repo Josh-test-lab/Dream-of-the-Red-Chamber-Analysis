@@ -1,0 +1,619 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 紅樓夢人物分析}
+
+\PYG{c+c1}{\PYGZsh{} 安裝相關係數可視化套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}corrplot\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝文字雲所需套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}tm\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}wordcloud\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝MDS所需套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}magrittr\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}dplyr\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}ggpubr\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}MASS\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝jaccard套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}vegan\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝人物關係相關套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}networkD3\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}readxl\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}tidyverse\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}jiebaR\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝 edge list 套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}igraph\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝dplyr套件(次數)}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}dplyr\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 安裝Rtsne套件}
+\PYG{n+nf}{install.packages}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Rtsne\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 自定義檔名函數}
+\PYG{n}{file\PYGZus{}name\PYGZus{}function}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m}{10}\PYG{p}{)}
+\PYG{+w}{    }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}紅樓夢\PYGZus{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{else}\PYG{+w}{ }\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{l+m}{100}\PYG{p}{)}
+\PYG{+w}{    }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}紅樓夢\PYGZus{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{else}
+\PYG{+w}{    }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}紅樓夢\PYGZus{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{return}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 字數統計函數}
+\PYG{n}{stat\PYGZus{}words}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n+nf}{returnValue}\PYG{p}{(}\PYG{n+nf}{sum}\PYG{p}{(}\PYG{n+nf}{nchar}\PYG{p}{(}\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}[，。！？：「」；《》『』——　 【、】1234567890]\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}[\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}]\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZhy{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}“\PYGZbs{}\PYGZbs{}”\PYGZbs{}\PYGZbs{}〝\PYGZbs{}\PYGZbs{}〞\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} \PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{file\PYGZus{}name}\PYG{p}{))))))))}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 統計出現幾次特定文字函數}
+\PYG{n}{stat\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name}\PYG{p}{)\PYGZob{}}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} name\PYGZus{}matrix \PYGZlt{}\PYGZhy{} 欲統計的字詞, num.hei \PYGZlt{}\PYGZhy{} 總回數, name \PYGZlt{}\PYGZhy{} 儲存的矩陣}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 名稱的替代(方便處理)}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}matrix\PYGZus{}change}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}person\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{),}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZti{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sep}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}matrix\PYGZus{}change2}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}person\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{sep}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 創建矩陣存放各章節人物出現次數}
+\PYG{+w}{  }\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nrow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{dimnames}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)))}
+
+\PYG{+w}{  }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{chapter}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{temp\PYGZus{}store\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{name\PYGZus{}matrix\PYGZus{}change}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{chapter}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{fixed}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 替換人物名稱並存入temp\PYGZus{}store\PYGZus{}name}
+\PYG{+w}{      }\PYG{n}{temp\PYGZus{}store\PYGZus{}name1}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{strsplit}\PYG{p}{(}\PYG{n}{temp\PYGZus{}store\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZti{}\PYGZdq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 切割字串並以\PYGZdq{}\PYGZti{}\PYGZdq{}分割}
+\PYG{+w}{      }\PYG{n}{name}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{grep}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix\PYGZus{}change2}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{temp\PYGZus{}store\PYGZus{}name1}\PYG{p}{[[}\PYG{l+m}{1}\PYG{p}{]]))}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 計算字串被切割幾次並儲存到name}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k+kr}{return}\PYG{p}{(}\PYG{n}{name}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 文字雲 自訂函數}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{tm}\PYG{p}{)}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{wordcloud}\PYG{p}{)}
+\PYG{n}{cloud}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{input\PYGZus{}array}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cloud\PYGZus{}title}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} imput\PYGZus{}array \PYGZlt{}\PYGZhy{} 資料, cloud\PYGZus{}title \PYGZlt{}\PYGZhy{} 文字雲標題}
+\PYG{+w}{  }\PYG{n+nf}{wordcloud}\PYG{p}{(}\PYG{n+nf}{names}\PYG{p}{(}\PYG{n}{input\PYGZus{}array}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{input\PYGZus{}array}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{scale}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{4}\PYG{p}{,}\PYG{l+m}{1}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{random.order}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{FALSE}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{rot.per}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0.1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{min.freq}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{colors}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{rainbow }\PYG{p}{(}\PYG{l+m}{40}\PYG{p}{))}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}文字雲描述出現次數}
+\PYG{+w}{  }\PYG{n+nf}{title}\PYG{p}{(}\PYG{n}{cloud\PYGZus{}title}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+\PYG{c+c1}{\PYGZsh{} words 參數指定需要繪製詞云的詞；freq 參數指定每個詞的頻率；scale 參數控制字體大小；min.freq 參數指定至少需要出現的次數；random.order 參數控制是否隨機排列詞；rot.per 參數控制字體旋轉的比例；colors 參數指定顏色；... 為其他附加參數}
+
+\PYG{c+c1}{\PYGZsh{} MDS 自訂函數}
+\PYG{n}{mds}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{data\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{mds\PYGZus{}title}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Load required packages}
+\PYG{+w}{  }\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{magrittr}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{dplyr}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{ggpubr}\PYG{p}{)}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Cmpute MDS}
+\PYG{+w}{  }\PYG{n}{mds\PYGZus{}oper}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{data\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{dist}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{cmdscale}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{n+nf}{as\PYGZus{}tibble}\PYG{p}{()}
+\PYG{+w}{  }\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{mds\PYGZus{}oper}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Dim.1\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Dim.2\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} Plot MDS}
+\PYG{+w}{  }\PYG{n+nf}{ggscatter}\PYG{p}{(}\PYG{n}{mds\PYGZus{}oper}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Dim.1\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Dim.2\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{          }\PYG{n}{label}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{rownames}\PYG{p}{(}\PYG{n}{data\PYGZus{}matrix}\PYG{p}{),}
+\PYG{+w}{          }\PYG{n}{size}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}
+\PYG{+w}{          }\PYG{n}{repel}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{,}
+\PYG{+w}{          }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{mds\PYGZus{}title}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{}jaccard自訂函數}
+\PYG{c+c1}{\PYGZsh{}Jaccard係數是用來衡量兩個集合的相似度。它的計算方法是將兩個集合的交集除以它們的聯集，結果介於0和1之間，數值越大，表示集合之間的相似度越高。}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{vegan}\PYG{p}{)}
+\PYG{n}{jaccard}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{data\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{jaccard\PYGZus{}title}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{vegdist}\PYG{p}{(}\PYG{n}{data\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{method}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}jaccard\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{as.matrix}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+\PYG{o}{\PYGZca{}\PYGZca{}}\PYG{n+nf}{Iprint}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n+nf}{mds}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{jaccard\PYGZus{}title}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{jaccard\PYGZus{}1}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{data\PYGZus{}matrix}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{vegdist}\PYG{p}{(}\PYG{n}{data\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{method}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}jaccard\PYGZdq{}}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{as.matrix}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{return}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 統計最多的前number名函數}
+\PYG{n}{top\PYGZus{}stat}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{k+kr}{function}\PYG{p}{(}\PYG{n}{input\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{output\PYGZus{}character}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{number}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{output\PYGZus{}character}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{sort}\PYG{p}{(}\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{input\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{decreasing}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{output\PYGZus{}character}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{output\PYGZus{}character}\PYG{p}{[}\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{number}\PYG{p}{]}
+\PYG{+w}{  }\PYG{k+kr}{return}\PYG{p}{(}\PYG{n}{output\PYGZus{}character}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 將所有章節輸入R}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{l+m}{120}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{file\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n+nf}{assign}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{readLines}\PYG{p}{(}\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}.txt\PYGZdq{}}\PYG{p}{)))}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{2}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{get}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{)))\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{p}{[}\PYG{l+m}{1}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{[}\PYG{l+m}{1}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{temp}\PYG{p}{[}\PYG{n}{j}\PYG{p}{])}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{n+nf}{assign}\PYG{p}{(}\PYG{n}{file\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{temp}\PYG{p}{[}\PYG{l+m}{1}\PYG{p}{])}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 各章節字數統計}
+\PYG{n}{words\PYGZus{}per\PYGZus{}chapter}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{120}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{dimnames}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}words\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{o}{:}\PYG{l+m}{120}\PYG{p}{)))}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{l+m}{120}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{words\PYGZus{}per\PYGZus{}chapter}\PYG{p}{[}\PYG{l+m}{1}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{stat\PYGZus{}words}\PYG{p}{(}\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)))}
+\PYG{p}{\PYGZcb{}}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{words\PYGZus{}per\PYGZus{}chapter}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 測試字數輸出}
+
+\PYG{c+c1}{\PYGZsh{} 定義欲探勘之章回}
+\PYG{n}{start\PYGZus{}file}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 起始章節}
+\PYG{n}{end\PYGZus{}file}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{120}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 結束章節}
+
+\PYG{n}{total\PYGZus{}words}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0}
+\PYG{n+nf}{cat}\PYG{p}{(}\PYG{n+nf}{paste}\PYG{p}{(}\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}起始章節：\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{start\PYGZus{}file}\PYG{p}{)),}\PYG{+w}{ }\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}結束章節：\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{end\PYGZus{}file}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{sep}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}\PYGZbs{}n\PYGZsq{}}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} 計算字數}
+\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{start\PYGZus{}file}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n+nf}{print}\PYG{p}{(}\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}錯誤！起始章節不可大於結束章節！\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZgt{}\PYGZdq{}}\PYG{+w}{ }\PYG{p}{,}\PYG{n}{end\PYGZus{}file}\PYG{p}{))}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{k+kr}{else}\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{o}{:}\PYG{n}{end\PYGZus{}file}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{total\PYGZus{}words}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{total\PYGZus{}words}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{words\PYGZus{}per\PYGZus{}chapter}\PYG{p}{[}\PYG{l+m}{1}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}共計\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{total\PYGZus{}words}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}字(去除空白與標點符號)\PYGZdq{}}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} 定義人物名稱}
+
+\PYG{c+c1}{\PYGZsh{} 主要人物名稱}
+\PYG{n}{name\PYGZus{}main}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}賈寶玉\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}林黛玉\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}薛寶釵\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}賈元春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}賈探春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}史湘雲\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}妙玉\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}賈迎春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}賈惜春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}王熙鳳\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}賈巧姐\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}李紈\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}秦可卿\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 別名}
+\PYG{n}{nickname\PYGZus{}賈寶玉}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}寶玉\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}此石\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}寶二爺\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}怡紅公子\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}絳洞花王\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}林黛玉}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}黛玉\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}顰顰\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}顰兒\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}林姑娘\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}林丫頭\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}瀟湘妃子\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}薛寶釵}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}寶釵\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}蘅蕪君\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}寶姐姐\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}寶丫頭\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}賈元春}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}元春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}賈妃\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}元妃\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}貴妃\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}大姑娘\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}賈探春}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}探春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}蕉下客\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}三姑娘\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}史湘雲}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}湘雲\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}枕霞舊友\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}妙玉}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}妙玉\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}檻外人\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}賈迎春}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}迎春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}二木頭\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}二姑娘\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}賈惜春}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}惜春\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}藕榭\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}四姑娘\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}王熙鳳}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}熙鳳\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}鳳辣子\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}璉二奶奶\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}賈巧姐}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}巧姐\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}妞妞\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}大姐兒\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}李紈}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}李紈\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}宮裁\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}稻香老農\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{nickname\PYGZus{}秦可卿}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}可卿\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}蓉大奶奶\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}兼美\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}秦氏\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 其餘人物名稱}
+\PYG{n}{other\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}賈母\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}劉姥姥\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}香菱\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}平兒\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}晴雯\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}襲人\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}紫鵑\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}鴛鴦\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}薛寶琴\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}定義要搜尋的人物名稱}
+\PYG{n}{name\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}小熊維尼\PYGZdq{}}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 給定預設值(後面不會用到)}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{person\PYGZus{}names}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nickname\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name\PYGZus{}main}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 人物別名指定}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n}{person\PYGZus{}names}\PYG{p}{))}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 合併至name\PYGZus{}matrix}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{name\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{[}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{other\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 刪除\PYGZdq{}小熊維尼\PYGZdq{}並合併其餘人物}
+\PYG{n}{name\PYGZus{}matrix}
+
+\PYG{c+c1}{\PYGZsh{} 定義回數 120回}
+\PYG{n}{num.hei}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{120}
+
+\PYG{c+c1}{\PYGZsh{} 統計出現次數函數}
+\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 宣告有name的存在}
+\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{stat\PYGZus{}name}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name}\PYG{p}{)}
+\PYG{n}{name}
+
+\PYG{n}{name\PYGZus{}all}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 將所有名字存入name\PYGZus{}all方便以後分析}
+
+\PYG{c+c1}{\PYGZsh{} 合併所有重複人物}
+\PYG{n}{total}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}
+\PYG{n}{temp\PYGZus{}1}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0}
+\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nrow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{n}{other\PYGZus{}name}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{num.hei}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{dimnames}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{n}{other\PYGZus{}name}\PYG{p}{),}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)))}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name\PYGZus{}all}\PYG{p}{[}\PYG{n}{total}\PYG{o}{:}\PYG{p}{(}\PYG{n}{total}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nickname\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name\PYGZus{}main}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])))}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{),}\PYG{+w}{ }\PYG{p}{]}
+\PYG{+w}{  }\PYG{n}{name}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{,}\PYG{l+m}{2}\PYG{p}{,}\PYG{n}{sum}\PYG{p}{)}
+\PYG{+w}{  }\PYG{n}{total}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{total}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nickname\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name\PYGZus{}main}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])))}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{name}\PYG{p}{[(}\PYG{n}{i}\PYG{l+m}{+1}\PYG{p}{)}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{n}{other\PYGZus{}name}\PYG{p}{)),}\PYG{+w}{ }\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name\PYGZus{}all}\PYG{p}{[(}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{other\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{)}\PYG{o}{:}\PYG{p}{(}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{)),}\PYG{+w}{ }\PYG{p}{]}
+
+\PYG{c+c1}{\PYGZsh{} 一回內出現最多的次數}
+\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{start\PYGZus{}file}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n+nf}{print}\PYG{p}{(}\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}錯誤！起始章節不可大於結束章節！\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZgt{}\PYGZdq{}}\PYG{+w}{ }\PYG{p}{,}\PYG{n}{end\PYGZus{}file}\PYG{p}{))}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{k+kr}{else}\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{times\PYGZus{}max}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{t}\PYG{p}{(}\PYG{n}{name}\PYG{p}{[}\PYG{+w}{ }\PYG{p}{,}\PYG{n}{start\PYGZus{}file}\PYG{o}{:}\PYG{n}{end\PYGZus{}file}\PYG{p}{]),}\PYG{l+m}{2}\PYG{p}{,}\PYG{n}{max}\PYG{p}{)}
+\PYG{+w}{    }\PYG{n}{times\PYGZus{}max}
+\PYG{+w}{    }\PYG{n}{times\PYGZus{}max}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{nrow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{n}{other\PYGZus{}name}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{2}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{dimnames}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{n}{other\PYGZus{}name}\PYG{p}{),}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}chapter\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}times\PYGZdq{}}\PYG{p}{)))}
+\PYG{+w}{    }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{dim}\PYG{p}{(}\PYG{n}{name}\PYG{p}{)[}\PYG{l+m}{1}\PYG{p}{])\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{0}
+\PYG{+w}{      }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{chapter}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{name}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{temp}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{          }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{chapter}\PYG{p}{]}
+\PYG{+w}{          }\PYG{n}{times\PYGZus{}max}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{l+m}{1}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{chapter}
+\PYG{+w}{          }\PYG{n}{times\PYGZus{}max}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{l+m}{2}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{temp}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 長條圖}
+\PYG{n}{name\PYGZus{}stat}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{name}\PYG{p}{[}\PYG{+w}{ }\PYG{p}{,}\PYG{n}{start\PYGZus{}file}\PYG{o}{:}\PYG{n}{end\PYGZus{}file}\PYG{p}{],}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 將name矩陣欲探勘章節所有回數合併}
+\PYG{n}{number}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{10}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 前number名}
+\PYG{n}{name\PYGZus{}stat\PYGZus{}10}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{sort}\PYG{p}{(}\PYG{n}{name\PYGZus{}stat}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{decreasing}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb+bp}{T}\PYG{p}{)[}\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{number}\PYG{p}{]}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 降冪排列取前number名人物}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{name\PYGZus{}stat\PYGZus{}10}\PYG{p}{)}
+\PYG{n+nf}{barplot}\PYG{p}{(}\PYG{n}{log}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}y\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name\PYGZus{}stat\PYGZus{}10}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{names.arg}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{names}\PYG{p}{(}\PYG{n}{name\PYGZus{}stat\PYGZus{}10}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{cex.names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{8}\PYG{o}{/}\PYG{p}{(}\PYG{n+nf}{as.numeric}\PYG{p}{(}\PYG{n}{number}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{xlab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人名\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ylab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}log(次數)\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回至第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}前\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{number}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}名人物總出現log次數統計表\PYGZdq{}}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{} 人物有出現在哪一回矩陣}
+\PYG{n}{person\PYGZus{}exist}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{name}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 將人物是否出現轉為\PYGZob{}0,1\PYGZcb{}元素}
+\PYG{n}{person\PYGZus{}exist}
+\PYG{n}{person\PYGZus{}exist.times}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{sum}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 出現次數}
+\PYG{n}{number}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{10}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 前number名}
+\PYG{n}{person\PYGZus{}exist.times.10}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{sort}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.times}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{decreasing}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{)[}\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{number}\PYG{p}{]}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 降冪排列取前number名人物}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.times.10}\PYG{p}{)}
+\PYG{n+nf}{barplot}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.times.10}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{names.arg}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{names}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.times.10}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{cex.names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{7}\PYG{o}{/}\PYG{p}{(}\PYG{n+nf}{as.numeric}\PYG{p}{(}\PYG{n}{number}\PYG{p}{)),}\PYG{+w}{ }\PYG{n}{xlab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人名\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ylab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}次數\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回至第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}前\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{number}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}名人物出現次數統計表\PYGZdq{}}\PYG{p}{))}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 出現在欲探勘章節中次數最多的前number名人物長條圖}
+
+\PYG{c+c1}{\PYGZsh{} 相關矩陣}
+\PYG{k+kr}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{start\PYGZus{}file}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n+nf}{print}\PYG{p}{(}\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}錯誤！起始章節不可大於結束章節！\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZgt{}\PYGZdq{}}\PYG{+w}{ }\PYG{p}{,}\PYG{n}{end\PYGZus{}file}\PYG{p}{))}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{k+kr}{else}\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{name\PYGZus{}cor}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{cor}\PYG{p}{(}\PYG{n+nf}{t}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[}\PYG{+w}{ }\PYG{p}{,}\PYG{n}{start\PYGZus{}file}\PYG{o}{:}\PYG{n}{end\PYGZus{}file}\PYG{p}{]))}
+\PYG{+w}{    }\PYG{c+c1}{\PYGZsh{}name\PYGZus{}cor}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{corrplot}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} Create a corrgram}
+\PYG{c+c1}{\PYGZsh{} 相關矩陣(不相關集中在左下)}
+\PYG{n+nf}{corrplot}\PYG{p}{(}\PYG{n}{name\PYGZus{}cor}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{method}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}color\PYGZsq{}}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{order}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}FPC\PYGZsq{}}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{type}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}lower\PYGZsq{}}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{tl.col}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}black\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{diag}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{FALSE}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{addCoef.col}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZsq{}black\PYGZsq{}}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{tl.cex}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{.}\PYG{l+m}{5}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{cl.cex}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{.}\PYG{l+m}{5}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{number.cex}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{.}\PYG{l+m}{35}\PYG{p}{,}
+\PYG{+w}{         }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回至第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回人物的相關矩陣\PYGZdq{}}\PYG{p}{)}
+\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 人物文字雲}
+\PYG{n+nf}{cloud}\PYG{p}{(}\PYG{n}{name\PYGZus{}stat}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{start\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回至第\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{end\PYGZus{}file}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}回人物出現總次數文字雲\PYGZdq{}}\PYG{p}{))}
+
+\PYG{c+c1}{\PYGZsh{}  每回中出現的人物數量}
+\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{,}\PYG{l+m}{2}\PYG{p}{,}\PYG{n}{sum}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}  平均多少字出現一位人物名字}
+\PYG{n}{words\PYGZus{}per\PYGZus{}chapter}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n+nf}{apply}\PYG{p}{(}\PYG{n}{name}\PYG{p}{,}\PYG{l+m}{2}\PYG{p}{,}\PYG{n}{sum}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 人物分析(參考至網路 \PYGZlt{}https://zhuanlan.zhihu.com/p/388637831\PYGZgt{})}
+
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{networkD3}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 畫網絡圖}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{readxl}\PYG{p}{)}\PYG{+w}{    }\PYG{c+c1}{\PYGZsh{} 讀取excel}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{tidyverse}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 分組統計}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{jiebaR}\PYG{p}{)}\PYG{+w}{    }\PYG{c+c1}{\PYGZsh{} 分詞}
+
+\PYG{c+c1}{\PYGZsh{} 人物名導入}
+\PYG{n}{name\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{read\PYGZus{}excel}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}人物表.xlsx\PYGZdq{}}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 多稱謂人物表導入}
+\PYG{n}{dupName\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{read\PYGZus{}excel}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}多稱謂人物.xlsx\PYGZdq{}}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 文檔導入}
+\PYG{c+c1}{\PYGZsh{} texts = readLines(\PYGZdq{}./雪中悍刀行.txt\PYGZdq{}, encoding=\PYGZdq{}gbk\PYGZdq{}) \PYGZsh{} 上方已導入過，下方將進行串聯}
+
+\PYG{c+c1}{\PYGZsh{} 將文章串聯(自行設計)}
+\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{start\PYGZus{}file}\PYG{p}{))}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{start\PYGZus{}file}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{)}\PYG{o}{:}\PYG{n}{end\PYGZus{}file}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n+nf}{file\PYGZus{}name\PYGZus{}function}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)))}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{texts}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{temp}
+
+\PYG{c+c1}{\PYGZsh{} 設置分詞器}
+\PYG{n}{engine1}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{worker}\PYG{p}{()}
+\PYG{n}{engine1}\PYG{o}{\PYGZdl{}}\PYG{n}{bylines}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}
+\PYG{c+c1}{\PYGZsh{} 分詞}
+\PYG{n}{seglist}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{segment}\PYG{p}{(}\PYG{n}{texts}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{engine1}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}head(seglist)}
+
+\PYG{n}{names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{()}\PYG{+w}{         }\PYG{c+c1}{\PYGZsh{} 姓名字典}
+\PYG{n}{relationships}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{()}\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 關係字典}
+\PYG{n}{lineNames}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{list}\PYG{p}{()}\PYG{+w}{      }\PYG{c+c1}{\PYGZsh{} 每段內人物關係}
+
+\PYG{k+kr}{for}\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{seglist}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{line\PYGZus{}i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{seglist}\PYG{p}{[[}\PYG{n}{i}\PYG{p}{]]}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 提取每個段落中的主要人物}
+\PYG{+w}{  }\PYG{n}{lineNames\PYGZus{}i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{intersect}\PYG{p}{(}\PYG{n}{line\PYGZus{}i}\PYG{p}{,}\PYG{n}{name\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{)}
+\PYG{+w}{  }\PYG{k+kr}{if}\PYG{p}{(}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{lineNames\PYGZus{}i}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{l+m}{2}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{    }\PYG{c+c1}{\PYGZsh{} 如果該段落中包含至少兩個主要人物，則對不同主要人物形成詞對}
+\PYG{+w}{    }\PYG{n}{lineNames}\PYG{p}{[[}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{lineNames}\PYG{p}{)}\PYG{l+m}{+1}\PYG{p}{]]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{n}{lineNames\PYGZus{}i}
+\PYG{+w}{    }\PYG{k+kr}{for}\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{p}{(}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{lineNames\PYGZus{}i}\PYG{p}{)}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kr}{for}\PYG{p}{(}\PYG{n}{j}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{l+m}{+1}\PYG{p}{)}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{lineNames\PYGZus{}i}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kr}{if}\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{          }\PYG{c+c1}{\PYGZsh{} 提取共現關係}
+\PYG{+w}{          }\PYG{n}{relationships}\PYG{p}{[[}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{relationships}\PYG{p}{)}\PYG{l+m}{+1}\PYG{p}{]]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{lineNames\PYGZus{}i}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],}\PYG{n}{lineNames\PYGZus{}i}\PYG{p}{[}\PYG{n}{j}\PYG{p}{])}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nf}{head}\PYG{p}{(}\PYG{n}{relationships}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 提取總人物}
+\PYG{n}{namelist}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{lineNames}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 提取共現關係}
+\PYG{n}{relationships\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n+nf}{t}\PYG{p}{(}\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{relationships}\PYG{p}{)),}\PYG{n}{stringsAsFactors}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb+bp}{F}\PYG{p}{)}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Sou\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZsq{}Tar\PYGZsq{}}\PYG{p}{)}
+\PYG{n+nf}{row.names}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 多稱謂人物合併}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{ncol}\PYG{p}{(}\PYG{n}{dupName\PYGZus{}df}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{dupName\PYGZus{}df}\PYG{p}{)[}\PYG{n}{i}\PYG{p}{]}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 每個主稱謂下的稱謂列表}
+\PYG{+w}{  }\PYG{n}{namelist\PYGZus{}i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{dupName\PYGZus{}df}\PYG{p}{[}\PYG{n}{name\PYGZus{}i}\PYG{p}{])}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 將多稱謂人物轉為主稱謂}
+\PYG{+w}{  }\PYG{n}{namelist}\PYG{p}{[}\PYG{n+nf}{which}\PYG{p}{(}\PYG{n}{namelist}\PYG{+w}{ }\PYG{o}{\PYGZpc{}in\PYGZpc{}}\PYG{+w}{ }\PYG{n}{namelist\PYGZus{}i}\PYG{p}{)]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name\PYGZus{}i}
+\PYG{+w}{  }\PYG{n}{relationships\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Sou}\PYG{p}{[}\PYG{n+nf}{which}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Sou}\PYG{+w}{ }\PYG{o}{\PYGZpc{}in\PYGZpc{}}\PYG{+w}{ }\PYG{n}{namelist\PYGZus{}i}\PYG{p}{)]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name\PYGZus{}i}
+\PYG{+w}{  }\PYG{n}{relationships\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Tar}\PYG{p}{[}\PYG{n+nf}{which}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Tar}\PYG{+w}{ }\PYG{o}{\PYGZpc{}in\PYGZpc{}}\PYG{+w}{ }\PYG{n}{namelist\PYGZus{}i}\PYG{p}{)]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{name\PYGZus{}i}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 將詞對表中每行進行排序，保證每兩個人物間只有一種順序。}
+\PYG{k+kr}{for}\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{relationships\PYGZus{}i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{unlist}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,])}
+\PYG{+w}{  }\PYG{n}{relationships\PYGZus{}df}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{relationships\PYGZus{}i}\PYG{p}{[}\PYG{n+nf}{order}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}i}\PYG{p}{)]}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nf}{head}\PYG{p}{(}\PYG{n}{relationships\PYGZus{}df}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 點數據}
+\PYG{n}{node\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{namelist}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{} 設置索引}
+\PYG{n}{node\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{o}{:}\PYG{p}{(}\PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{node\PYGZus{}df}\PYG{p}{)}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{),}\PYG{n}{name}\PYG{o}{=}\PYG{n}{namelist}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 匹配分組\PYGZhy{}也是各個主要人物所在的勢力}
+\PYG{+w}{  }\PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{name\PYGZus{}df}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 設置邊節點對應列表}
+\PYG{n}{namline\PYGZus{}source}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{rename}\PYG{p}{(}\PYG{n}{source}\PYG{o}{=}\PYG{n}{Id}\PYG{p}{,}\PYG{n}{Sou}\PYG{o}{=}\PYG{n}{namelist}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Sou}\PYG{p}{,}\PYG{n}{source}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 起始點ID表}
+\PYG{n}{namline\PYGZus{}target}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{rename}\PYG{p}{(}\PYG{n}{target}\PYG{o}{=}\PYG{n}{Id}\PYG{p}{,}\PYG{n}{Tar}\PYG{o}{=}\PYG{n}{namelist}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Tar}\PYG{p}{,}\PYG{n}{target}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 終點ID表}
+
+\PYG{c+c1}{\PYGZsh{} 邊數據統計詞頻}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{relationships\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{Sou}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{Tar}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Sou}\PYG{p}{,}\PYG{n}{Tar}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{summarise}\PYG{p}{(}\PYG{n}{Value}\PYG{o}{=}\PYG{n+nf}{n}\PYG{p}{())}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{Value}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m}{5}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}\PYGZsh{}有錯誤}
+\PYG{c+c1}{\PYGZsh{} 匹配邊節點ID}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{namline\PYGZus{}source}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{namline\PYGZus{}target}\PYG{p}{)}
+\PYG{n+nf}{head}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 畫網絡圖}
+\PYG{n+nf}{forceNetwork}\PYG{p}{(}\PYG{n}{Links}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}線性質數據框}
+\PYG{+w}{             }\PYG{n}{Nodes}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}節點性質數據框}
+\PYG{+w}{             }\PYG{n}{Group}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}group\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點分組 節點數據中對應的列名}
+\PYG{+w}{             }\PYG{n}{Source}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}source\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}連線的源變量 邊數據中起始點ID}
+\PYG{+w}{             }\PYG{n}{Target}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}target\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}連線的目標變量 邊數據中終點ID}
+\PYG{+w}{             }\PYG{n}{Value}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Value\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}邊的粗細值，邊數據中共現頻率列名}
+\PYG{+w}{             }\PYG{n}{NodeID}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點名稱}
+\PYG{+w}{             }\PYG{n}{Nodesize}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Freq\PYGZdq{}}\PYG{+w}{ }\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點大小，節點數據框中節點頻率列名}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}美化部分}
+\PYG{+w}{             }\PYG{n}{fontSize}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{30}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點文本標籤的數字字體大小（以像素為單位）。}
+\PYG{+w}{             }\PYG{n}{linkColour}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}grey\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}連線顏色,black,red,blue,}
+\PYG{+w}{             }\PYG{n}{colourScale}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{JS}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}d3.scaleOrdinal(d3.schemeCategory10);\PYGZdq{}}\PYG{p}{),}
+\PYG{+w}{              }\PYG{c+c1}{\PYGZsh{}colourScale ,linkWidth,\PYGZsh{}節點顏色,red，藍色blue,cyan,yellow等}
+\PYG{+w}{             }\PYG{n}{charge}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{\PYGZhy{}2000}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}數值表示節點排斥強度（負值）或吸引力（正值）}
+\PYG{+w}{             }\PYG{n}{opacity}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0.5}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點透明度}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}nodeColour=\PYGZdq{}black\PYGZdq{},}
+\PYG{+w}{             }\PYG{n}{fontFamily}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}黑體\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{             }\PYG{n}{arrows}\PYG{o}{=}\PYG{n+nb+bp}{F}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}是否帶方向}
+\PYG{+w}{             }\PYG{n}{bounded}\PYG{o}{=}\PYG{n+nb+bp}{F}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}是否啟用限製圖像的邊框}
+\PYG{+w}{             }\PYG{n}{opacityNoHover}\PYG{o}{=}\PYG{l+m}{2}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}當鼠標懸停在其上時，節點標籤文本的不透明度比例的數值}
+\PYG{+w}{             }\PYG{n}{zoom}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb+bp}{T}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}允許放縮，雙擊放大}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}clickAction = MyClickScript}
+\PYG{+w}{             }\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 創建空的關係矩陣}
+\PYG{n}{relationship\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]),}\PYG{+w}{ }\PYG{n}{nrow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]))}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{other\PYGZus{}name}\PYG{p}{)}
+\PYG{n+nf}{rownames}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{other\PYGZus{}name}\PYG{p}{)}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 輸入資料}
+\PYG{k+kr}{for}\PYG{p}{(}\PYG{n}{chapter}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kr}{if}\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{person\PYGZus{}exist}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{person\PYGZus{}exist}\PYG{p}{[}\PYG{n}{j}\PYG{p}{,}\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{1}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{j}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k+kr}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{j}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 輸出結果}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{chapter}\PYG{p}{)}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 創建邊數據}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{igraph}\PYG{p}{)}
+\PYG{n}{g}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{graph.adjacency}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}
+\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{get.edgelist}\PYG{p}{(}\PYG{n}{g}\PYG{p}{)}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{rbind}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{temp}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{p}{[}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{,]}
+
+\PYG{c+c1}{\PYGZsh{} 創建節點數據}
+\PYG{n}{freq}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{arrange}\PYG{p}{(}\PYG{n+nf}{match}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{read\PYGZus{}excel}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}人物表.xlsx\PYGZdq{}}\PYG{p}{)}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{))}
+\PYG{n}{node\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{name}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{group}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{group}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{freq}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{freq}\PYG{p}{[}\PYG{l+m}{2}\PYG{p}{])}
+
+\PYG{c+c1}{\PYGZsh{} 合併重複的邊}
+
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{from}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]),}\PYG{+w}{ }\PYG{n}{to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{[,}\PYG{l+m}{2}\PYG{p}{]))}
+\PYG{c+c1}{\PYGZsh{} 使用 count 函數創建包含重複次數的新數據框}
+\PYG{n}{edge\PYGZus{}df\PYGZus{}count}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{count}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{from}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{to}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 將新數據框與原始數據框合併}
+\PYG{n}{edge\PYGZus{}df\PYGZus{}merged}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{merge}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df\PYGZus{}count}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}from\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}to\PYGZdq{}}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{} 刪除重複的列}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{distinct}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df\PYGZus{}merged}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 關係次數大於number次}
+\PYG{n}{number}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}
+\PYG{n}{edge\PYGZus{}df}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{p}{[}\PYG{n+nf}{round}\PYG{p}{(}\PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{n}\PYG{o}{*}\PYG{l+m}{10}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{number}\PYG{p}{,]}
+
+\PYG{c+c1}{\PYGZsh{} 將邊數據轉換為 networkD3 需要的格式}
+\PYG{n}{links}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{source}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{match}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{from}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{)}\PYG{+w}{  }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n}{target}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{match}\PYG{p}{(}\PYG{n}{edge\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{to}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{)}\PYG{+w}{  }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n}{value}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{n}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n}{from}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{from}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n}{to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{to}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} x軸標籤的方向}
+\PYG{n+nf}{par}\PYG{p}{(}\PYG{n}{las}\PYG{o}{=}\PYG{l+m}{2}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 人物出現頻率長條圖}
+\PYG{n}{node\PYGZus{}df.order}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{p}{[}\PYG{n+nf}{order}\PYG{p}{(}\PYG{n}{node\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Freq}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{decreasing}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{TRUE}\PYG{p}{),]}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 排序資料(Freq)}
+\PYG{n+nf}{barplot}\PYG{p}{(}\PYG{n}{node\PYGZus{}df.order}\PYG{o}{\PYGZdl{}}\PYG{n}{Freq}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{names.arg}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df.order}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cex.names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{2}\PYG{o}{/}\PYG{p}{(}\PYG{n+nf}{as.numeric}\PYG{p}{(}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{node\PYGZus{}df}\PYG{p}{))),}\PYG{+w}{ }\PYG{n}{xlab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人物\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ylab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}出現頻率\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人物出現頻率長條圖\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} x軸標籤的方向}
+\PYG{n+nf}{par}\PYG{p}{(}\PYG{n}{las}\PYG{o}{=}\PYG{l+m}{2}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 人物關係log次數長條圖}
+\PYG{n+nf}{barplot}\PYG{p}{(}\PYG{n+nf}{log}\PYG{p}{(}\PYG{n}{links}\PYG{o}{\PYGZdl{}}\PYG{n}{value}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{names.arg}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{n}{links}\PYG{o}{\PYGZdl{}}\PYG{n}{from}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZhy{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{links}\PYG{o}{\PYGZdl{}}\PYG{n}{to}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{cex.names}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{/}\PYG{p}{(}\PYG{n+nf}{as.numeric}\PYG{p}{(}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{links}\PYG{p}{))),}\PYG{+w}{ }\PYG{n}{xlab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人物\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ylab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}出現頻率\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人物關係log次數長條圖\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} x軸標籤的方向}
+\PYG{n+nf}{par}\PYG{p}{(}\PYG{n}{las}\PYG{o}{=}\PYG{l+m}{1}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 人物關係次數分布長條圖}
+\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{cut}\PYG{p}{(}\PYG{n}{links}\PYG{o}{\PYGZdl{}}\PYG{n}{value}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{breaks}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{seq}\PYG{p}{(}\PYG{n}{from}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{100}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{10}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{right}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{FALSE}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{labels}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{seq}\PYG{p}{(}\PYG{n}{from}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{100}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{10}\PYG{p}{)[}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{])}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{table}\PYG{p}{()}
+\PYG{n+nf}{barplot}\PYG{p}{(}\PYG{n}{temp}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{xlab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}間距\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ylab}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}次數\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{main}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}人物關係次數分布長條圖\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 創建網絡圖}
+\PYG{n+nf}{forceNetwork}\PYG{p}{(}\PYG{n}{Links}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{links}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}線性質數據框}
+\PYG{+w}{             }\PYG{n}{Nodes}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}節點性質數據框}
+\PYG{+w}{             }\PYG{n}{Group}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}group\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點分組 節點數據中對應的列名}
+\PYG{+w}{             }\PYG{n}{Source}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}source\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}連線的源變量 邊數據中起始點ID}
+\PYG{+w}{             }\PYG{n}{Target}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}target\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}連線的目標變量 邊數據中終點ID}
+\PYG{+w}{             }\PYG{n}{Value}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}邊的粗細值，邊數據中共現頻率列名}
+\PYG{+w}{             }\PYG{n}{NodeID}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點名稱}
+\PYG{+w}{             }\PYG{n}{Nodesize}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Freq\PYGZdq{}}\PYG{+w}{ }\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點大小，節點數據框中節點頻率列名}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}美化部分}
+\PYG{+w}{             }\PYG{n}{fontSize}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{30}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點文本標籤的數字字體大小（以像素為單位）。}
+\PYG{+w}{             }\PYG{n}{linkColour}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}grey\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}連線顏色,black,red,blue,}
+\PYG{+w}{             }\PYG{n}{colourScale}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{JS}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}d3.scaleOrdinal(d3.schemeCategory10);\PYGZdq{}}\PYG{p}{),}
+\PYG{+w}{              }\PYG{c+c1}{\PYGZsh{}colourScale ,linkWidth,\PYGZsh{}節點顏色,red，藍色blue,cyan,yellow等}
+\PYG{+w}{             }\PYG{n}{charge}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{\PYGZhy{}2000}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{}數值表示節點排斥強度（負值）或吸引力（正值）}
+\PYG{+w}{             }\PYG{n}{opacity}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0.5}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}節點透明度}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}nodeColour=\PYGZdq{}black\PYGZdq{},}
+\PYG{+w}{             }\PYG{n}{fontFamily}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}黑體\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{             }\PYG{n}{arrows}\PYG{o}{=}\PYG{n+nb+bp}{F}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}是否帶方向}
+\PYG{+w}{             }\PYG{n}{bounded}\PYG{o}{=}\PYG{n+nb+bp}{F}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}是否啟用限製圖像的邊框}
+\PYG{+w}{             }\PYG{n}{opacityNoHover}\PYG{o}{=}\PYG{l+m}{2}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}當鼠標懸停在其上時，節點標籤文本的不透明度比例的數值}
+\PYG{+w}{             }\PYG{n}{zoom}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb+bp}{T}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{}允許放縮，雙擊放大}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}clickAction = MyClickScript}
+\PYG{+w}{             }\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 創建空的關係矩陣}
+\PYG{n}{relationship\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{matrix}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ncol}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]),}\PYG{+w}{ }\PYG{n}{nrow}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]))}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{other\PYGZus{}name}\PYG{p}{)}
+\PYG{n+nf}{rownames}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{other\PYGZus{}name}\PYG{p}{)}
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 輸入資料}
+\PYG{k+kr}{for}\PYG{p}{(}\PYG{n}{chapter}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n}{num.hei}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]))}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kr}{if}\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{person\PYGZus{}exist}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{person\PYGZus{}exist}\PYG{p}{[}\PYG{n}{j}\PYG{p}{,}\PYG{n}{chapter}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{1}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{j}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k+kr}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}
+\PYG{+w}{        }\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{[}\PYG{n}{j}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}\PYGZdq{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{} 輸出結果}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{chapter}\PYG{p}{)}
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} edge name list}
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{igraph}\PYG{p}{)}
+\PYG{n}{g}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{graph.adjacency}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}matrix}\PYG{p}{)}
+\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{get.edgelist}\PYG{p}{(}\PYG{n}{g}\PYG{p}{)}
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{rbind}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{temp}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{[}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{,]}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Sou\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZsq{}Tar\PYGZsq{}}\PYG{p}{)}
+\PYG{n+nf}{row.names}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 點數據}
+\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{} 設置索引}
+\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0}\PYG{o}{:}\PYG{p}{(}\PYG{n+nf}{nrow}\PYG{p}{(}\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{p}{)}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{),}\PYG{n}{name}\PYG{o}{=}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{+w}{  }\PYG{c+c1}{\PYGZsh{} 匹配分組\PYGZhy{}也是各個主要人物所在的勢力}
+\PYG{+w}{  }\PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{name\PYGZus{}df}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 設置邊節點對應列表}
+\PYG{n}{namline\PYGZus{}source}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{rename}\PYG{p}{(}\PYG{n}{source}\PYG{o}{=}\PYG{n}{Id}\PYG{p}{,}\PYG{n}{Sou}\PYG{o}{=}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Sou}\PYG{p}{,}\PYG{n}{source}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 起始点ID表}
+\PYG{n}{namline\PYGZus{}target}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{rename}\PYG{p}{(}\PYG{n}{target}\PYG{o}{=}\PYG{n}{Id}\PYG{p}{,}\PYG{n}{Tar}\PYG{o}{=}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Tar}\PYG{p}{,}\PYG{n}{target}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 终点ID表}
+
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{from}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{]),}\PYG{+w}{ }\PYG{n}{to}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name}\PYG{p}{[,}\PYG{l+m}{2}\PYG{p}{]))}
+\PYG{c+c1}{\PYGZsh{} 使用 count 函數創建包含重複次數的新數據框}
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}count}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{count}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{from}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{to}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} 將新數據框與原始數據框合併}
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}merged}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{merge}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}count}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{by}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}from\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}to\PYGZdq{}}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{} 刪除重複的列}
+\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{distinct}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}merged}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 將邊數據轉換為 networkD3 需要的格式}
+\PYG{n}{edge\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{data.frame}\PYG{p}{(}\PYG{n}{source}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{match}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{o}{\PYGZdl{}}\PYG{n}{from}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n}{target}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{match}\PYG{p}{(}\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{o}{\PYGZdl{}}\PYG{n}{to}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{o}{\PYGZdl{}}\PYG{n}{name}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m}{1}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n}{value}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{relationship\PYGZus{}df\PYGZus{}name\PYGZus{}stat}\PYG{o}{\PYGZdl{}}\PYG{n}{n}\PYG{p}{)}
+
+
+\PYG{c+c1}{\PYGZsh{} 邊數據統計詞頻}
+\PYG{n}{edge\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df\PYGZus{}name}\PYG{+w}{ }\PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}\PYG{+w}{ }\PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{value}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m}{25}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 畫網絡圖}
+\PYG{n+nf}{forceNetwork}\PYG{p}{(}\PYG{n}{Links}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{edge\PYGZus{}df\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 線性質數據框}
+\PYG{+w}{             }\PYG{n}{Nodes}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{node\PYGZus{}df\PYGZus{}name}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 節點性質數據框}
+\PYG{+w}{             }\PYG{n}{Group}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}group\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 節點分組 節點數據中對應的列名}
+\PYG{+w}{             }\PYG{n}{Source}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}source\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 連線的源變量 邊數據中起始點ID}
+\PYG{+w}{             }\PYG{n}{Target}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}target\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 連線的目標變量 邊數據中終點ID}
+\PYG{+w}{             }\PYG{n}{Value}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}value\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 邊的粗細值，邊數據中共現頻率列名}
+\PYG{+w}{             }\PYG{n}{NodeID}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 節點名稱}
+\PYG{+w}{             }\PYG{n}{Nodesize}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Freq\PYGZdq{}}\PYG{+w}{ }\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 節點大小，節點數據框中節點頻率列名}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}美化部分}
+\PYG{+w}{            }\PYG{n}{fontSize}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{30}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 節點文本標籤的數字字體大小（以像素為單位）。}
+\PYG{+w}{             }\PYG{n}{linkColour}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}grey\PYGZdq{}}\PYG{p}{,}\PYG{c+c1}{\PYGZsh{} 連線顏色,black,red,blue,}
+\PYG{+w}{             }\PYG{n}{colourScale}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nf}{JS}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}d3.scaleOrdinal(d3.schemeCategory10);\PYGZdq{}}\PYG{p}{),}
+\PYG{+w}{              }\PYG{c+c1}{\PYGZsh{}colourScale ,linkWidth, \PYGZsh{} 節點顏色,red，藍色blue,cyan,yellow等}
+\PYG{+w}{             }\PYG{n}{charge}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{\PYGZhy{}2000}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 數值表示節點排斥強度（負值）或吸引力（正值）}
+\PYG{+w}{             }\PYG{n}{opacity}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{0.5}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 節點透明度}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{} nodeColour=\PYGZdq{}black\PYGZdq{},}
+\PYG{+w}{             }\PYG{n}{fontFamily}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}黑體\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{             }\PYG{n}{arrows}\PYG{o}{=}\PYG{n+nb+bp}{F}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 是否帶方向}
+\PYG{+w}{             }\PYG{n}{bounded}\PYG{o}{=}\PYG{n+nb+bp}{F}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 是否啟用限製圖像的邊框}
+\PYG{+w}{             }\PYG{n}{opacityNoHover}\PYG{o}{=}\PYG{l+m}{2}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 當鼠標懸停在其上時，節點標籤文本的不透明度比例的數值}
+\PYG{+w}{             }\PYG{n}{zoom}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb+bp}{T}\PYG{p}{,}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 允許放縮，雙擊放大}
+\PYG{+w}{             }\PYG{c+c1}{\PYGZsh{} clickAction = MyClickScript}
+\PYG{+w}{             }\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} MDS}
+\PYG{n+nf}{mds}\PYG{p}{(}\PYG{n}{name}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}MDS人物總出現次數\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{mds}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}MDS人物出現次數\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} 人物jaccard方法}
+\PYG{n+nf}{jaccard}\PYG{p}{(}\PYG{n}{name}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}MDS人物總次數文字雲(jaccard)\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nf}{jaccard}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}MDS人物次數文字雲(jaccard)\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} PCA}
+\PYG{n}{person\PYGZus{}exist.jaccard}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{jaccard\PYGZus{}1}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist}\PYG{p}{)}
+\PYG{n}{pca.result}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{prcomp}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.jaccard}\PYG{p}{)}
+\PYG{n+nf}{plot}\PYG{p}{(}
+\PYG{+w}{  }\PYG{n}{pca.result}\PYG{o}{\PYGZdl{}}\PYG{n}{x}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{],}
+\PYG{+w}{  }\PYG{n}{pca.result}\PYG{o}{\PYGZdl{}}\PYG{n}{x}\PYG{p}{[,}\PYG{l+m}{2}\PYG{p}{],}
+\PYG{+w}{  }\PYG{n}{pch}\PYG{o}{=}\PYG{l+m}{19}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{xlab}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}PCA PC1\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{ylab}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}PCA PC2\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{main}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}Separation with PCA\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{col}\PYG{o}{=}\PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZus{}.*\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{n}{node\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{group}\PYG{p}{))}
+\PYG{+w}{  }\PYG{p}{)}
+\PYG{n+nf}{text}\PYG{p}{(}\PYG{n}{pca.result}\PYG{o}{\PYGZdl{}}\PYG{n}{x}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{pca.result}\PYG{o}{\PYGZdl{}}\PYG{n}{x}\PYG{p}{[,}\PYG{l+m}{2}\PYG{p}{],}\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZus{}.*\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.jaccard}\PYG{p}{)),}\PYG{n}{pos}\PYG{o}{=}\PYG{l+m}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cex}\PYG{o}{=}\PYG{l+m}{0.7}\PYG{p}{)}
+
+\PYG{n+nf}{library}\PYG{p}{(}\PYG{n}{Rtsne}\PYG{p}{)}
+\PYG{n}{rtsne.result}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{Rtsne}\PYG{p}{(}\PYG{n}{person\PYGZus{}exist.jaccard}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{perplexity}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m}{5}\PYG{p}{)}
+\PYG{n+nf}{plot}\PYG{p}{(}
+\PYG{+w}{  }\PYG{n}{rtsne.result}\PYG{o}{\PYGZdl{}}\PYG{n}{Y}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{col}\PYG{o}{=}\PYG{n+nf}{as.factor}\PYG{p}{(}\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZus{}.*\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{n}{node\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{group}\PYG{p}{)),}
+\PYG{+w}{  }\PYG{n}{pch}\PYG{o}{=}\PYG{l+m}{19}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{xlab}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}TSNE dim1\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{ylab}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}TSNE dim2\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{  }\PYG{n}{main}\PYG{o}{=}\PYG{l+s}{\PYGZdq{}Separation with the Rtsne package\PYGZdq{}}
+\PYG{+w}{  }\PYG{p}{)}
+\PYG{n+nf}{text}\PYG{p}{(}\PYG{n}{rtsne.result}\PYG{o}{\PYGZdl{}}\PYG{n}{Y}\PYG{p}{[,}\PYG{l+m}{1}\PYG{p}{],}\PYG{n}{rtsne.result}\PYG{o}{\PYGZdl{}}\PYG{n}{Y}\PYG{p}{[,}\PYG{l+m}{2}\PYG{p}{],}\PYG{n+nf}{gsub}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZus{}.*\PYGZdq{}}\PYG{p}{,}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{,}\PYG{n+nf}{colnames}\PYG{p}{(}
+\PYG{n}{person\PYGZus{}exist.jaccard}\PYG{p}{)),}\PYG{n}{pos}\PYG{o}{=}\PYG{l+m}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{cex}\PYG{o}{=}\PYG{l+m}{0.5}\PYG{p}{)}
+\end{MintedVerbatim}

@@ -59,7 +59,7 @@
     {\fontsize{14}{14}\selectfont \textbf{\textit{The Analysis of Characters in Dream of the Red Chamber}}\par}
     \vspace{1\baselineskip}
     \vspace{4cm}
-    \includegraphics[width=6cm]{NDHU_logo.png}\\
+    \includegraphics[width=6cm]{img/NDHU_logo.png}\\
     \vspace{0.5cm}
     {\fontsize{22}{22}\selectfont 學生：許堯智~~李世勛~~黃定綸~~撰\par}
     \vspace{1.85\baselineskip}
@@ -99,7 +99,7 @@
 本次研究流程與架構分為以下五步驟：
 %\begin{figure}[htbp]
 %    \centering
-%    \hypertarget{picture_1}{\includegraphics[width=0.99\textwidth]{process.png}}
+%    \hypertarget{picture_1}{\includegraphics[width=0.99\textwidth]{img/process.png}}
 %    \caption*{圖一~~研究流程架構圖}
 %\end{figure}
 
@@ -166,7 +166,7 @@ stat_words <- function(file_name){
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_2}{\includegraphics[width=0.95\textwidth]{RTSNE3.png}}
+    \hypertarget{picture_2}{\includegraphics[width=0.95\textwidth]{img/RTSNE3.png}}
     \caption*{圖二~~ t-SNE 分群}
 \end{figure}
 
@@ -348,7 +348,7 @@ name[(i+1):length(c(name_main,other_name)), ] <- name_all[(length(name_matrix) -
 
 \begin{figure}[H]
     \centering
-    \hypertarget{form_1}{\includegraphics[width=0.9\textwidth]{name.png}}
+    \hypertarget{form_1}{\includegraphics[width=0.9\textwidth]{img/name.png}}
     \caption*{表一~~ name 矩陣/人物總出現次數矩陣}
 \end{figure}
 
@@ -361,7 +361,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{form_2}{\includegraphics[width=0.9\textwidth]{person.png}}
+    \hypertarget{form_2}{\includegraphics[width=0.9\textwidth]{img/person.png}}
     \caption*{表二~~人物出現矩陣}
 \end{figure}
 
@@ -372,7 +372,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_3}{\includegraphics[width=0.5\textwidth]{文字雲.png}}
+    \hypertarget{picture_3}{\includegraphics[width=0.5\textwidth]{img/文字雲.png}}
     \caption*{圖三~~ 使用 wordcloud 後的視覺化結果}
 \end{figure}
 
@@ -388,7 +388,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{form_3}{\includegraphics[width=1.0\textwidth]{person.png}}
+    \hypertarget{form_3}{\includegraphics[width=1.0\textwidth]{img/person.png}}
     \caption*{表三~~人物出現矩陣}
 \end{figure}
 
@@ -398,7 +398,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_4}{\includegraphics[width=0.9\textwidth]{長條圖.png}}
+    \hypertarget{picture_4}{\includegraphics[width=0.9\textwidth]{img/長條圖.png}}
     \caption*{圖四~~人物出現次數統計長條圖}
 \end{figure}
 
@@ -410,7 +410,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_5}{\includegraphics[width=0.9999\textwidth]{相關矩陣.png}}
+    \hypertarget{picture_5}{\includegraphics[width=0.9999\textwidth]{img/相關矩陣.png}}
     \caption*{圖五~~相關係數矩陣圖}
 \end{figure}
 
@@ -424,7 +424,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_6}{\includegraphics[width=0.6\textwidth]{文字雲.png}}
+    \hypertarget{picture_6}{\includegraphics[width=0.6\textwidth]{img/文字雲.png}}
     \caption*{圖六~~人物總出現次數文字雲}
 \end{figure}
 
@@ -439,7 +439,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 其中，該網站的程式碼是使用一種分詞器，一種名為「jiebaR」的套件來進行分詞。這個 R 語言的內建套件支援四種不同的分詞模式，同時還支援姓名、簡體中文、正體中文和關鍵字等功能。
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_7}{\includegraphics[width=0.7\textwidth]{網路文章程式碼繪圖.png}}
+    \hypertarget{picture_7}{\includegraphics[width=0.7\textwidth]{img/網路文章程式碼繪圖.png}}
     \caption*{圖七~~網站程式碼所構出的網路圖}
 \end{figure}
 在此網路圖中，節點所代表的是該人物出現的頻率，節點間的線段代表人物在同一章回中共同出現的次數，其中線段愈粗者，表示人物間一起出現次數愈高，而節點顏色所代表的則是個人物所代表的家族。\\
@@ -451,13 +451,13 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 由於上述所發生的問題，必須對分詞的資料進行了修正，於是以下使用之前建立的「\hyperlink{form_3}{人物出現矩陣}」進行了篩選，並將兩個人物在同一回內出現的關係設置為 1 ，否則設置為 0 。再根據這些關係計算頻率和相關資料重新繪製出如\hyperlink{picture_8}{圖八}的\hyperlink{picture_8}{網路圖}。
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_8}{\includegraphics[width=0.645\textwidth]{網路圖.png}}
+    \hypertarget{picture_8}{\includegraphics[width=0.645\textwidth]{img/網路圖.png}}
     \caption*{圖八~~經調整後的網路圖}
 \end{figure}
 經過調整之後的網路圖如上所示。從圖中可以看出，這張圖已經接近最初所收集的資料，相較於 R 語言內建的分詞工具，其相對展示正常的人物關係，更貼近原本《紅樓夢》的故事發展。儘管已將有關的人物關係合併並使用粗線條表示，但發現該圖雖然仍具有互動性，但由於線條關係眾多造成閱讀障礙，因此我們將兩個人物之間的關係頻率小於25的線段刪去，並得到以下網路圖。
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_9}{\includegraphics[width=0.645\textwidth]{刪減網路圖.png}}
+    \hypertarget{picture_9}{\includegraphics[width=0.645\textwidth]{img/刪減網路圖.png}}
     \caption*{圖九~~經刪減後的網路圖}
 \end{figure}
 從上圖中，可以看到只繪製了主要互動的人物關係，並能輕鬆地透過節點大小與線段粗細分別看出人物的出現頻率和關係。然而，圖中人物之間的距離沒有具體的含義。為了使人物之間的距離具有意義並更好地進行分群，於是採用了多元尺度分析（MDS）方法。\\
@@ -471,7 +471,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_10}{\includegraphics[width=0.9999\textwidth]{mds.png}}
+    \hypertarget{picture_10}{\includegraphics[width=0.9999\textwidth]{img/mds.png}}
     \caption*{圖十~~MDS分群效果}
 \end{figure}
 
@@ -490,7 +490,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 \indent 以下是添加了 Jaccard 後生成的 MDS 文字雲。從圖中可以清楚地看到群組中的點與點之間更加緊密，並且可以更好地觀察到人物之間的生活圈，以更好地判讀人物之間的關係。此外，藉由數據的相似度轉換，也可以有效將出場次數較少的人物分開，如 MDS 分群結果中妙玉看似和六到七位關係親密，但透過 Jaccard 轉換後，該人物即明顯與原先其他人物有一定距離，而小說故事狀況也是如此。\\
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_11}{\includegraphics[width=0.9999\textwidth]{mds(jaccard).png}}
+    \hypertarget{picture_11}{\includegraphics[width=0.9999\textwidth]{img/mds(jaccard).png}}
     \caption*{圖十一~~MDS經由 Jaccard 方法後的分群效果}
 \end{figure}
 
@@ -502,7 +502,7 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_12}{\includegraphics[width=0.9999\textwidth]{pca.png}}
+    \hypertarget{picture_12}{\includegraphics[width=0.9999\textwidth]{img/pca.png}}
     \caption*{圖十二~~PCA 分群效果}
 \end{figure}
 
@@ -514,9 +514,9 @@ person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
 
 \begin{figure}[H]
     \centering
-    \hypertarget{picture_13}{\includegraphics[width=0.9999\textwidth]{RTSNE3.png}}
+    \hypertarget{picture_13}{\includegraphics[width=0.9999\textwidth]{img/RTSNE3.png}}
     \caption*{圖十三~~ t-SNE 分群結果}
-    \hypertarget{picture_14}{\includegraphics[width=0.9999\textwidth]{RTSNE4.png}}
+    \hypertarget{picture_14}{\includegraphics[width=0.9999\textwidth]{img/RTSNE4.png}}
     \caption*{圖十四~~ t-SNE 分群結果}
 \end{figure}
 

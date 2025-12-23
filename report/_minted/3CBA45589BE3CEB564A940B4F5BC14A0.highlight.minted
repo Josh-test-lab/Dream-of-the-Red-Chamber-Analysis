@@ -1,0 +1,9 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}定義要搜尋的人物名稱}
+\PYG{n}{name\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}小熊維尼\PYGZdq{}}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 給定預設值(後面不會用到)}
+\PYG{k+kr}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{k+kr}{in}\PYG{+w}{ }\PYG{l+m}{1}\PYG{o}{:}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{name\PYGZus{}main}\PYG{p}{))\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{person\PYGZus{}names}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nickname\PYGZus{}\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{name\PYGZus{}main}\PYG{p}{[}\PYG{n}{i}\PYG{p}{])}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 人物別名指定}
+\PYG{+w}{  }\PYG{n}{name\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nf}{get}\PYG{p}{(}\PYG{n}{person\PYGZus{}names}\PYG{p}{))}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 合併至name\PYGZus{}matrix}
+\PYG{p}{\PYGZcb{}}
+\PYG{n}{name\PYGZus{}matrix}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZhy{}}\PYG{+w}{ }\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{name\PYGZus{}matrix}\PYG{p}{[}\PYG{l+m}{\PYGZhy{}1}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{other\PYGZus{}name}\PYG{p}{)}\PYG{+w}{ }\PYG{c+c1}{\PYGZsh{} 刪除\PYGZdq{}小熊維尼\PYGZdq{}並合併其餘人物}
+\end{MintedVerbatim}
