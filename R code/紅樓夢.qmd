@@ -1,0 +1,629 @@
+---
+title: "紅樓夢"
+author: "定世堯"
+format: html
+editor: visual
+---
+
+```{r}
+# 紅樓夢
+
+# 安裝文字雲所需套件
+#install.packages("tm")
+#install.packages("wordcloud")
+
+# 安裝相關係數可視化套件
+#install.packages("corrplot")
+
+# 安裝UI套件
+#install.packages("shiny")
+
+# 安裝MDS所需套件
+#install.packages("magrittr")
+#install.packages("dplyr")
+#install.packages("ggpubr")
+#install.packages("MASS")
+
+# 安裝jaccard套件
+#install.packages("vegan")
+
+# 安裝人物關係相關套件
+#install.packages("networkD3")
+#install.packages("readxl")
+#install.packages("tidyverse")
+#install.packages("jiebaR")
+
+# 安裝 edge list 套件
+#install.packages("igraph")
+
+# 安裝dplyr套件(次數)
+#install.packages("dplyr")
+```
+
+![](https://i0.wp.com/nightelfmeowmeow.com/wp-content/uploads/2019/08/%E7%B4%85%E6%A8%93%E5%A4%A2%E4%BA%BA%E7%89%A9%E9%97%9C%E4%BF%82%E8%A1%A8-1.png)
+
+```{r}
+# 自定義檔名函數
+file_name_function = function(i){
+  if (i < 10)
+    file_name <- paste0("紅樓夢_第", 0, 0, i, "回")
+  else if (i < 100)
+    file_name <- paste0("紅樓夢_第", 0, i, "回")
+  else
+    file_name <- paste0("紅樓夢_第", i, "回")
+  return(file_name)
+}
+
+# 字數統計函數
+stat_words <- function(file_name){
+  returnValue(sum(nchar(gsub("[，。！？：「」；《》『』——　 【、】1234567890]", "", gsub("\\[", " ", gsub("\\]", " ", gsub("-", " ", gsub("\\“\\”\\〝\\〞", " ", file_name))))))))
+}
+
+# 統計出現幾次特定文字函數
+stat_name <- function(name_matrix, num.hei, name){ # name_matrix <- 欲統計的字詞, num.hei <- 總回數, name <- 儲存的矩陣
+  
+  # 名稱的替代(方便處理)
+  name_matrix_change <- paste("person_", 1:length(name_matrix), "~", sep = "") 
+  name_matrix_change2 <- paste("person_", 1:length(name_matrix), sep = "")
+
+  # 創建矩陣存放各章節人物出現次數
+  name <- matrix(0, nrow = length(name_matrix), ncol = num.hei, dimnames = list(name_matrix, c(1:num.hei)))
+  
+  for (chapter in 1:num.hei){
+    for (i in 1:length(name_matrix)){
+      temp_store_name <- gsub(name_matrix[i], name_matrix_change[i], get(file_name_function(chapter)), fixed = TRUE) # 替換人物名稱並存入x
+      temp_store_name1 <- strsplit(temp_store_name, "~") # 切割字串並以"~"分割
+      name[i, chapter] <- length(grep(name_matrix_change2[i], temp_store_name1[[1]])) # 計算字串被切割幾次並儲存到name
+    }
+  }
+  return(name)
+}
+
+# 文字雲 自訂函數
+library(tm)
+library(wordcloud)
+cloud <- function(input_array, cloud_title) { # imput_array <- 資料, cloud_title <- 文字雲標題
+  wordcloud(names(input_array), input_array, scale = c(4,1), random.order = FALSE, rot.per = 0.1, min.freq = 1, colors = rainbow (40)) #文字雲描述出現次數
+  title(cloud_title)
+}
+# words 參數指定需要繪製詞云的詞；freq 參數指定每個詞的頻率；scale 參數控制字體大小；min.freq 參數指定至少需要出現的次數；random.order 參數控制是否隨機排列詞；rot.per 參數控制字體旋轉的比例；colors 參數指定顏色；... 為其他附加參數
+
+# MDS 自訂函數
+mds <- function(data_matrix, mds_title){
+  # Load required packages
+  library(magrittr)
+  library(dplyr)
+  library(ggpubr)
+  # Cmpute MDS
+  mds_oper <- data_matrix %>%
+  dist() %>%          
+  cmdscale() %>%
+  as_tibble()
+  colnames(mds_oper) <- c("Dim.1", "Dim.2")
+  # Plot MDS
+  ggscatter(mds_oper, x = "Dim.1", y = "Dim.2", 
+          label = rownames(data_matrix),
+          size = 1,
+          repel = TRUE,
+          main = mds_title)
+}
+
+#jaccard自訂函數
+#Jaccard係數是用來衡量兩個集合的相似度。它的計算方法是將兩個集合的交集除以它們的聯集，結果介於0和1之間，數值越大，表示集合之間的相似度越高。
+library(vegan)
+jaccard <- function(data_matrix, jaccard_title){
+  temp <- vegdist(data_matrix, method = "jaccard")
+  temp <- as.matrix(temp)
+	print(temp)
+  mds(temp, jaccard_title)
+  
+}
+
+# 統計最多的前number名函數
+top_stat <- function(input_matrix, output_character, number){
+  output_character <- sort(apply(input_matrix, 1, sum), decreasing = TRUE)
+  output_character <- output_character[1:number]
+  return(output_character)
+}
+```
+
+```{r}
+# 將所有章節輸入R
+for (i in 1:120){
+  file_name <- file_name_function(i)
+  assign(file_name, readLines(paste0(file_name, ".txt")))
+  temp <- get(file_name)
+  for (j in 2:length(get(file_name))){
+  temp[1] <- paste0(temp[1], temp[j])
+  }
+  assign(file_name, temp[1])
+}
+
+# 各章節字數統計
+words_per_chapter <- matrix(0, ncol = 120, dimnames = list("words", c(1:120)))
+for (i in 1:120){
+  words_per_chapter[1,i] <- stat_words(get(file_name_function(i)))
+}
+print(words_per_chapter) # 測試字數輸出
+```
+
+```{r}
+# 定義欲探勘之章回
+start_file <- 1 # 起始章節
+end_file <- 120 # 結束章節
+
+total_words <- 0
+cat(paste(paste("起始章節：", file_name_function(start_file)), paste("結束章節：", file_name_function(end_file)), sep = '\n'))
+
+# 計算字數
+if (start_file > end_file){
+  print(paste("錯誤！起始章節不可大於結束章節！", start_file, ">" ,end_file))
+  }else{
+  for (i in start_file:end_file){
+    total_words <- total_words + words_per_chapter[1,i]
+  }
+}
+print(paste("共計", total_words, "字(去除空白與標點符號)"))
+```
+
+```{r}
+# 定義人物名稱
+
+# 主要人物名稱
+name_main <- c("賈寶玉", "林黛玉", "薛寶釵", "賈元春", "賈探春", "史湘雲", "妙玉", "賈迎春", "賈惜春", "王熙鳳", "賈巧姐", "李紈", "秦可卿") 
+
+# 別名
+nickname_賈寶玉 <- c("寶玉", "此石", "寶二爺", "怡紅公子", "絳洞花王") 
+nickname_林黛玉 <- c("黛玉", "顰顰", "顰兒", "林姑娘", "林丫頭", "瀟湘妃子")
+nickname_薛寶釵 <- c("寶釵", "蘅蕪君", "寶姐姐", "寶丫頭")
+nickname_賈元春 <- c("元春", "賈妃", "元妃", "貴妃", "大姑娘")
+nickname_賈探春 <- c("探春", "蕉下客", "三姑娘")
+nickname_史湘雲 <- c("湘雲", "枕霞舊友")
+nickname_妙玉 <- c("妙玉", "檻外人")
+nickname_賈迎春 <- c("迎春", "二木頭", "二姑娘")
+nickname_賈惜春 <- c("惜春", "藕榭", "四姑娘")
+nickname_王熙鳳 <- c("熙鳳", "鳳辣子", "璉二奶奶")
+nickname_賈巧姐 <- c("巧姐", "妞妞", "大姐兒")
+nickname_李紈 <- c("李紈", "宮裁", "稻香老農")
+nickname_秦可卿 <- c("可卿", "蓉大奶奶", "兼美","秦氏")
+
+# 其餘人物名稱
+other_name <- c("賈母", "劉姥姥", "香菱", "平兒", "晴雯", "襲人", "紫鵑", "鴛鴦", "薛寶琴") 
+
+#定義要搜尋的人物名稱
+name_matrix <- "小熊維尼" # 給定預設值(後面不會用到)
+for (i in 1:length(name_main)){
+  person_names <- paste0("nickname_", name_main[i]) # 人物別名指定
+  name_matrix <- c(name_matrix, get(person_names)) # 合併至name_matrix
+}
+name_matrix <- c(name_matrix[-1], other_name) # 刪除"小熊維尼"並合併其餘人物
+name_matrix
+
+# 定義回數 120回
+num.hei <- 120
+
+# 統計出現次數函數
+name <- 0 # 宣告有name的存在
+name <- stat_name(name_matrix, num.hei, name)
+name
+
+name_all <- name # 將所有名字存入name_all方便以後分析
+
+# 合併所有重複人物
+total <- 1
+temp_1 <- 0
+name <- matrix(0, nrow = length(c(name_main,other_name)), ncol = num.hei, dimnames = list(c(name_main,other_name), c(1:num.hei)))
+for (i in 1:length(name_main)){
+  temp <- name_all[total:(total + length(get(paste0("nickname_", name_main[i]))) - 1), ]
+  name[i,] <- apply(temp,2,sum)
+  total <- total + length(get(paste0("nickname_", name_main[i])))
+}
+name[(i+1):length(c(name_main,other_name)), ] <- name_all[(length(name_matrix) - length(other_name) + 1):(length(name_matrix)), ]
+name
+
+# 一回內出現最多的次數
+if (start_file > end_file){
+  print(paste("錯誤！起始章節不可大於結束章節！", start_file, ">" ,end_file))
+  }else{
+#    times_max <- apply(t(name[ ,start_file:end_file]),2,max)
+#    times_max
+    times_max <- matrix(0, nrow = length(c(name_main,other_name)), ncol = 2, dimnames = list(c(name_main,other_name), c("chapter", "times")))
+    for (i in 1:dim(name)[1]){
+      temp <- 0
+      for (chapter in 1:num.hei){
+        if (name[i,chapter] > temp){
+          temp <- name[i,chapter]
+          times_max[i,1] <- chapter
+          times_max[i,2] <- temp
+        }
+      }
+    }
+    print("一回內出現最多的次數")
+    times_max
+}
+```
+
+```{r}
+# 相關矩陣
+if (start_file > end_file){
+  print(paste("錯誤！起始章節不可大於結束章節！", start_file, ">" ,end_file))
+  }else{
+    name_cor <- cor(t(name[ ,start_file:end_file]))
+    name_cor
+  }
+
+library(corrplot)
+# Create a corrgram
+# 相關矩陣(不相關集中在左下)
+corrplot(name_cor,
+         method = 'color',
+         order = 'FPC',
+         type = 'lower',
+         tl.col = "black",
+         diag = FALSE,
+         addCoef.col = 'black',
+         tl.cex = .5,
+         cl.cex = .5,
+         number.cex = .35,
+         main = paste0("第", start_file, "回至第", end_file, "回人物的相關矩陣"))
+```
+
+```{r}
+# 長條圖
+if (start_file > end_file){
+  print(paste("錯誤！起始章節不可大於結束章節！", start_file, ">" ,end_file))
+  }else{
+  name_stat <- apply(name[ ,start_file:end_file], 1, sum) # 將name矩陣欲探勘章節所有回數合併
+
+  number <- 10 # 前number名
+  name_stat_10 <- sort(name_stat, decreasing = T)[1:number] # 降冪排列取前number名人物
+  print(name_stat_10)
+  barplot(log = "y", name_stat_10, names.arg = names(name_stat_10), cex.names = 8/(as.numeric(number)), xlab = "人名", ylab = "log(次數)", main = paste0("第", start_file, "回至第", end_file, "回", "前", number, "名人物總出現log次數統計表"))
+}
+```
+
+```{r}
+# 人物有出現在哪一回矩陣
+if (start_file > end_file){
+  print(paste("錯誤！起始章節不可大於結束章節！", start_file, ">" ,end_file))
+  }else{
+  person_exist <- 1 * (name & TRUE) # 將人物是否出現轉為{0,1}元素
+  person_exist.times <- apply(person_exist, 1, sum) # 出現次數
+  number <- 10 # 前number名
+  person_exist.times.10 <- sort(person_exist.times, decreasing = TRUE)[1:number] # 降冪排列取前number名人物
+  print(person_exist.times.10)
+  barplot(person_exist.times.10, names.arg = names(person_exist.times.10), cex.names = 7/(as.numeric(number)), xlab = "人名", ylab = "次數", main = paste0("第", start_file, "回至第", end_file, "回", "前", number, "名人物出現次數統計表")) # 出現在欲探勘章節中次數最多的前number名人物長條圖
+}
+```
+
+```{r}
+# 人物文字雲
+if (start_file > end_file){
+  print(paste("錯誤！起始章節不可大於結束章節！", start_file, ">" ,end_file))
+  }else{cloud(name_stat, paste("第", start_file, "回至第", end_file, "回人物出現總次數文字雲"))}
+```
+
+```{r}
+# MDS
+mds(name, "MDS人物總出現次數")
+mds(person_exist, "MDS人物出現次數")
+```
+
+```{r}
+# 人物jaccard方法
+jaccard(name, "MDS人物總次數文字雲(jaccard)")
+jaccard(person_exist, "MDS人物次數文字雲(jaccard)")
+```
+
+```{r}
+#  每回中出現的人物數量
+apply(person_exist,2,sum)
+```
+
+```{r}
+#  平均多少字出現一位人物名字
+words_per_chapter / apply(name,2,sum)
+```
+
+```{r}
+# 人物分析(參考至網路 <https://zhuanlan.zhihu.com/p/388637831>)
+
+library(networkD3) # 畫網絡圖
+library(readxl)    # 讀取excel
+library(tidyverse) # 分組統計
+library(jiebaR)    # 分詞
+
+# 人物名導入
+name_df <- read_excel("人物表.xlsx")
+# 多稱謂人物表導入
+dupName_df <- read_excel("多稱謂人物.xlsx")
+# 文檔導入
+# texts = readLines("./雪中悍刀行.txt", encoding="gbk") # 上方已導入過，下方將進行串聯
+
+# 將文章串聯(自行設計)
+temp <- get(file_name_function(start_file))
+for (i in (start_file + 1):end_file){
+  temp <- c(temp, get(file_name_function(i)))
+}
+texts <- temp
+
+# 設置分詞器
+engine1 = worker()
+engine1$bylines = TRUE
+# 分詞
+seglist = segment(texts, engine1)
+head(seglist)
+
+names = c()         # 姓名字典
+relationships = list()  # 關係字典
+lineNames = list()      # 每段內人物關係
+
+for(i in 1:length(seglist)){
+  line_i <- seglist[[i]]
+  # 提取每個段落中的主要人物
+  lineNames_i <- intersect(line_i,name_df$name)
+  if(length(lineNames_i) >=2){
+    # 如果該段落中包含至少兩個主要人物，則對不同主要人物形成詞對
+    lineNames[[length(lineNames)+1]] <-lineNames_i
+    for(i in 1:(length(lineNames_i)-1)) {
+      for(j in (i+1):length(lineNames_i)) {
+        if(i != j){
+          # 提取共現關係
+          relationships[[length(relationships)+1]] <- c(lineNames_i[i],lineNames_i[j])
+        }
+      }
+    }
+  }
+}
+
+head(relationships)
+
+# 提取總人物
+namelist <- unlist(lineNames)
+
+# 提取共現關係
+relationships_df <- data.frame(t(data.frame(relationships)),stringsAsFactors = F)
+colnames(relationships_df) <- c("Sou",'Tar')
+row.names(relationships_df) <- 1:nrow(relationships_df)
+
+# 多稱謂人物合併
+for (i in 1:ncol(dupName_df)) {
+  name_i <- colnames(dupName_df)[i]
+  # 每個主稱謂下的稱謂列表
+  namelist_i <- unlist(dupName_df[name_i])
+  # 將多稱謂人物轉為主稱謂
+  namelist[which(namelist %in% namelist_i)] <- name_i
+  relationships_df$Sou[which(relationships_df$Sou %in% namelist_i)] <- name_i
+  relationships_df$Tar[which(relationships_df$Tar %in% namelist_i)] <- name_i
+}
+
+# 將詞對表中每行進行排序，保證每兩個人物間只有一種順序。
+for(i in 1:nrow(relationships_df)){
+  relationships_i <- unlist(relationships_df[i,])
+  relationships_df[i,] <- relationships_i[order(relationships_i)]
+}
+
+
+head(relationships_df)
+
+# 點數據
+node_df <- data.frame(table(namelist))
+# 設置索引
+node_df <- node_df %>% mutate(Id = 0:(nrow(node_df)-1),name=namelist) %>% 
+  # 匹配分組-也是各個主要人物所在的勢力
+  left_join(name_df)
+
+# 設置邊節點對應列表 
+namline_source <- node_df %>% rename(source=Id,Sou=namelist) %>% select(Sou,source) # 起始點ID表
+namline_target <- node_df %>% rename(target=Id,Tar=namelist) %>% select(Tar,target) # 終點ID表
+
+# 邊數據統計詞頻
+edge_df <- relationships_df %>% filter(Sou != Tar) %>% group_by(Sou,Tar) %>% summarise(Value=n()) %>% filter(Value > 5)
+# 匹配邊節點ID
+edge_df <- edge_df %>% left_join(namline_source) %>% left_join(namline_target) 
+head(edge_df)
+
+# 畫網絡圖
+forceNetwork(Links = edge_df,#線性質數據框
+             Nodes = node_df,#節點性質數據框
+             Group = "group", #節點分組 節點數據中對應的列名
+             Source = "source",#連線的源變量 邊數據中起始點ID
+             Target = "target",#連線的目標變量 邊數據中終點ID
+             Value = "Value", #邊的粗細值，邊數據中共現頻率列名
+             NodeID = "name", #節點名稱
+             Nodesize = "Freq" , #節點大小，節點數據框中節點頻率列名
+             ###美化部分
+             fontSize = 30, #節點文本標籤的數字字體大小（以像素為單位）。
+             linkColour="grey",#連線顏色,black,red,blue,  
+             colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+              #colourScale ,linkWidth,#節點顏色,red，藍色blue,cyan,yellow等
+             charge = -2000,#數值表示節點排斥強度（負值）或吸引力（正值）  
+             opacity = 0.5, #節點透明度
+             #nodeColour="black",
+             fontFamily = "黑體",
+             arrows=F, #是否帶方向
+             bounded=F, #是否啟用限製圖像的邊框
+             opacityNoHover=2, #當鼠標懸停在其上時，節點標籤文本的不透明度比例的數值
+             zoom = T, #允許放縮，雙擊放大
+             #clickAction = MyClickScript
+             )
+```
+
+## Code_1
+
+```{r}
+# https://stackoverflow.com/questions/13204046/how-to-create-an-edge-list-from-a-matrix-in-r
+# 創建空的關係矩陣
+relationship_matrix <- matrix(0, ncol = length(person_exist[,1]), nrow = length(person_exist[,1]))
+colnames(relationship_matrix) <- c(name_main, other_name)
+rownames(relationship_matrix) <- c(name_main, other_name)
+relationship_df_name <- c("", "")
+
+# 輸入資料
+for(chapter in 1:num.hei){
+  for (i in 1:length(person_exist[,1])) {
+    for (j in 1:length(person_exist[,1])) {
+      if(i != j && person_exist[i,chapter] != 0 && person_exist[j,chapter] != 0){
+        relationship_matrix[i,j] = 1
+        relationship_matrix[j,i] = ""
+      } else {
+        relationship_matrix[i,j] = 0
+        relationship_matrix[j,i] = ""
+      }
+    }
+  }
+
+# 輸出結果
+#print(chapter)
+#print(relationship_matrix)
+
+# edge name list
+library(igraph)
+g <- graph.adjacency(relationship_matrix)
+temp <- get.edgelist(g)
+relationship_df_name <- rbind(relationship_df_name, temp)
+}
+relationship_df_name <- relationship_df_name[-1,]
+colnames(relationship_df_name) <- c("Sou",'Tar')
+row.names(relationship_df_name) <- 1:nrow(relationship_df_name)
+
+# 點數據
+node_df_name <- data.frame(table(relationship_df_name))
+# 設置索引
+node_df_name <- node_df_name %>% mutate(Id = 0:(nrow(node_df_name)-1),name=relationship_df_name) %>% 
+  # 匹配分組-也是各個主要人物所在的勢力
+  left_join(name_df)
+
+# 設置邊節點對應列表
+namline_source <- node_df_name %>% rename(source=Id,Sou=relationship_df_name) %>% select(Sou,source) # 起始点ID表
+namline_target <- node_df_name %>% rename(target=Id,Tar=relationship_df_name) %>% select(Tar,target) # 终点ID表
+
+relationship_df_name_stat <- data.frame(from = c(relationship_df_name[,1]), to = c(relationship_df_name[,2]))
+# 使用 count 函數創建包含重複次數的新數據框
+relationship_df_name_count <- count(relationship_df_name_stat, from, to)
+# 將新數據框與原始數據框合併
+relationship_df_name_merged <- merge(relationship_df_name_stat, relationship_df_name_count, by = c("from", "to"))
+# 刪除重複的列
+relationship_df_name_stat <- distinct(relationship_df_name_merged)
+
+# 將邊數據轉換為 networkD3 需要的格式
+edge_df_name <- data.frame(source = match(relationship_df_name_stat$from, node_df_name$name) - 1,
+                    target = match(relationship_df_name_stat$to, node_df_name$name) - 1,
+                    value = relationship_df_name_stat$n)
+
+
+# 邊數據統計詞頻
+edge_df_name <- edge_df_name %>% filter(value > 25)
+
+# 畫網絡圖
+forceNetwork(Links = edge_df_name, # 線性質數據框
+             Nodes = node_df_name, # 節點性質數據框
+             Group = "group", # 節點分組 節點數據中對應的列名
+             Source = "source", # 連線的源變量 邊數據中起始點ID
+             Target = "target", # 連線的目標變量 邊數據中終點ID
+             Value = "value", # 邊的粗細值，邊數據中共現頻率列名
+             NodeID = "name", # 節點名稱
+             Nodesize = "Freq" , # 節點大小，節點數據框中節點頻率列名
+             ###美化部分
+            fontSize = 30, # 節點文本標籤的數字字體大小（以像素為單位）。
+             linkColour="grey",# 連線顏色,black,red,blue,  
+             colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+              #colourScale ,linkWidth, # 節點顏色,red，藍色blue,cyan,yellow等
+             charge = -2000, # 數值表示節點排斥強度（負值）或吸引力（正值）  
+             opacity = 0.5, # 節點透明度
+             # nodeColour="black",
+             fontFamily = "黑體",
+             arrows=F, # 是否帶方向
+             bounded=F, # 是否啟用限製圖像的邊框
+             opacityNoHover=2, # 當鼠標懸停在其上時，節點標籤文本的不透明度比例的數值
+             zoom = T, # 允許放縮，雙擊放大
+             # clickAction = MyClickScript
+             )
+```
+
+## Code_2
+
+```{r}
+# 創建空的關係矩陣
+relationship_matrix <- matrix(0, ncol = length(person_exist[,1]), nrow = length(person_exist[,1]))
+colnames(relationship_matrix) <- c(name_main, other_name)
+rownames(relationship_matrix) <- c(name_main, other_name)
+edge_df <- c("", "")
+
+# 輸入資料
+for(chapter in 1:num.hei){
+  for (i in 1:length(person_exist[,1])) {
+    for (j in 1:length(person_exist[,1])) {
+      if(i != j && person_exist[i,chapter] != 0 && person_exist[j,chapter] != 0){
+        relationship_matrix[i,j] = 1
+        relationship_matrix[j,i] = ""
+      } else {
+        relationship_matrix[i,j] = 0
+        relationship_matrix[j,i] = ""
+      }
+    }
+  }
+
+# 輸出結果
+#print(chapter)
+#print(relationship_matrix)
+
+# 創建邊數據
+library(igraph)
+g <- graph.adjacency(relationship_matrix)
+temp <- get.edgelist(g)
+edge_df <- rbind(edge_df, temp)
+}
+edge_df <- edge_df[-1,]
+
+# 創建節點數據
+freq <- data.frame(table(edge_df)) %>% arrange(match(edge_df, node_df$name))
+node_df <- data.frame(name = c(name_df$name), group = c(name_df$group), freq = freq[2])
+node_df
+
+# 合併重複的邊
+
+edge_df <- data.frame(from = c(edge_df[,1]), to = c(edge_df[,2]))
+# 使用 count 函數創建包含重複次數的新數據框
+edge_df_count <- count(edge_df, from, to)
+# 將新數據框與原始數據框合併
+edge_df_merged <- merge(edge_df, edge_df_count, by = c("from", "to"))
+# 刪除重複的列
+edge_df <- distinct(edge_df_merged)
+
+# 關係次數大於number次 
+number <- 25
+edge_df <- edge_df[edge_df$n > number,]
+
+# 將邊數據轉換為 networkD3 需要的格式
+links <- data.frame(source = match(edge_df$from, node_df$name)  - 1,
+                    target = match(edge_df$to, node_df$name)  - 1,
+                    value = edge_df$n,
+                    from = edge_df$from,
+                    to = edge_df$to)
+
+# 創建網絡圖
+forceNetwork(Links = links,#線性質數據框
+             Nodes = node_df,#節點性質數據框
+             Group = "group", #節點分組 節點數據中對應的列名
+             Source = "source",#連線的源變量 邊數據中起始點ID
+             Target = "target",#連線的目標變量 邊數據中終點ID
+             Value = "value", #邊的粗細值，邊數據中共現頻率列名
+             NodeID = "name", #節點名稱
+             Nodesize = "Freq" , #節點大小，節點數據框中節點頻率列名
+             ###美化部分
+             fontSize = 30, #節點文本標籤的數字字體大小（以像素為單位）。
+             linkColour="grey",#連線顏色,black,red,blue,  
+             colourScale = JS("d3.scaleOrdinal(d3.schemeCategory10);"),
+              #colourScale ,linkWidth,#節點顏色,red，藍色blue,cyan,yellow等
+             charge = -2000,#數值表示節點排斥強度（負值）或吸引力（正值）  
+             opacity = 0.5, #節點透明度
+             #nodeColour="black",
+             fontFamily = "黑體",
+             arrows=F, #是否帶方向
+             bounded=F, #是否啟用限製圖像的邊框
+             opacityNoHover=2, #當鼠標懸停在其上時，節點標籤文本的不透明度比例的數值
+             zoom = T, #允許放縮，雙擊放大
+             #clickAction = MyClickScript
+             )
+```
